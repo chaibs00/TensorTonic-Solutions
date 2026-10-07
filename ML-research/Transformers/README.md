@@ -86,3 +86,15 @@ Briefly explain each component.
 
 ---
 
+
+| # | Topic | Description | Difficulty |
+|:-:|:------|:------------|:----------:|
+| 01 | [Tokenization](https://www.tensortonic.com/research/transformer/transformers-tokenization) | Convert text to token IDs | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 02 | [Embedding Layer](transformers/02-embedding-layer/) | Map tokens to vectors | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 03 | [Positional Encoding](transformers/03-positional-encoding/) | Inject position via sinusoids | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 04 | [Scaled Dot-Product Attention](transformers/04-scaled-dot-product-attention/) | Core QKV mechanism | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 05 | [Multi-Head Attention](transformers/05-multi-head-attention/) | Parallel attention heads | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
+| 06 | [Feed-Forward Network](transformers/06-feed-forward-network/) | Position-wise MLP | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 07 | [Layer Normalization](transformers/07-layer-normalization/) | Normalize activations | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 08 | [Encoder Block](transformers/08-encoder-block/) | Complete encoder layer | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 🏁 | **[Assemble & train a Transformer](transformers/09-end-to-end/)** | End-to-end | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
