@@ -47,7 +47,7 @@
 
 | # | Paper | ArXiv | Year | Folder |
 |:-:|:-----:|:-----:|:----:|:------:|
-| 1 | $\color{#22d3ee}{\textbf{Attention Is All You Need}}$ | ![arXiv](https://img.shields.io/badge/arXiv-1706.03762-b31b1b?style=flat-square&labelColor=0d1117) | 2017 | [📂 Transformers](/ML-research/Transformers/) |
+| 1 | $\color{#22d3ee}{\textbf{Attention Is All You Need}}$ | [![arXiv](https://img.shields.io/badge/arXiv-1706.03762-b31b1b?style=flat-square&labelColor=0d1117)](https://arxiv.org/abs/1706.03762) | 2017 | [📂 Transformers](/ML-research/Transformers/) |
 | 2 | $\color{#22d3ee}{\textbf{Kimi K3}}$ | [Link](https://arxiv.org/abs/2607.24653) | 2026 | `kimi-k3` |
 | 3 | $\color{#22d3ee}{\textbf{ResNet}}$ | [Link](https://arxiv.org/abs/1512.03385) | 2015 | `resnet` |
 | 4 | $\color{#22d3ee}{\textbf{Word2Vec}}$ | [Link](https://arxiv.org/abs/1301.3781) | 2013 | `word2vec` |
