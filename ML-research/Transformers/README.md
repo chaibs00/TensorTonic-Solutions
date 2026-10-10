@@ -2,7 +2,7 @@
 
 **Authors:** Vaswani et al.  
 **Year:** 2017  
-**Paper:** [arXiv link](...)
+**Paper:** [![arXiv](https://img.shields.io/badge/arXiv-1706.03762-b31b1b?style=flat-square&labelColor=0d1117)](https://arxiv.org/abs/1706.03762)
 
 ---
 
