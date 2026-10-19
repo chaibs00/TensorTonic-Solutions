@@ -4,7 +4,6 @@
 
 <div align="center">
 
-![Topic](https://img.shields.io/badge/topic-tokenization-a3e635?style=flat-square&labelColor=0d1117)&nbsp;
 ![Medium](https://img.shields.io/badge/difficulty-medium-eab308?style=flat-square&labelColor=0d1117)&nbsp;
 [![TensorTonic](https://img.shields.io/badge/solve%20it-TensorTonic-22d3ee?style=flat-square&labelColor=0d1117)](https://www.tensortonic.com/research/transformer/transformers-tokenization)
 
@@ -14,76 +13,108 @@
 
 <br>
 
-## Problem :
+## $\color{#a3e635}{\text{Problem}}$
 
-Build a simple **word-level tokenizer** with three functions:
+Implement a simple **`word-level tokenizer`** that converts text into integer IDs and back.
 
-- `build_vocab(texts)`: create the vocabulary from training sentences
-- `encode(text)`: text → list of token IDs
-- `decode(ids)`: token IDs → space-separated text
+> 📄 The original paper uses a **subword** tokenizer (byte-pair encoding). This is a simplified word-level version.
 
 <br>
 
+## $\color{#a3e635}{\text{How It Works}}$
 
-## 🏷 Special tokens
+The tokenizer works in **two phases**:
+
+```mermaid
+flowchart LR
+    subgraph P1["Phase 1 · runs once"]
+        A["Training sentences"] --> B["build_vocab"] --> C[("Vocabulary<br>word ↔ ID")]
+    end
+    subgraph P2["Phase 2 · runs on any text"]
+        D["New text"] --> E["encode"] --> F["[5, 9]"] --> G["decode"] --> H["Text"]
+    end
+    C -.lookup.-> E
+    C -.lookup.-> G
+```
+
+- **Phase 1:** `build_vocab` **creates** the dictionary from training data.
+- **Phase 2:** `encode` and `decode` only **look up** words and IDs in it. They never add new words.
+
+> Both phases lowercase and split text **the same way**, so words always match.
+
+<br>
+
+### $\color{red}{\text{1. Build Vocabulary — creates the dictionary}}$
+
+1. Reserve IDs `0–3` for the special tokens.
+2. Lowercase each training sentence and split it on whitespace.
+3. Keep only **unique** words, **sort** them, and assign IDs starting from `4`.
+
+<div align="center">
 
 | Token | ID | Role |
 |:--|:--:|:--|
 | PAD | 0 | Fill shorter sequences to the same length |
-| UNK | 1 | Any word not in the vocab |
-| BOS | 2 | Beginning of sequence |
-| EOS | 3 | End of sequence |
+| UNK | 1 | Replaces any word not in the vocabulary |
+| BOS | 2 | Marks the beginning of a sequence |
+| EOS | 3 | Marks the end of a sequence |
 
-## 💡 Intuition
+</div>
 
-A model can't read words, only numbers. The tokenizer is a **two-way lookup table** between words and IDs.
-
-> 📄 The paper uses **subword** tokenization (byte-pair encoding). This exercise is a simplified word-level version, enough to feed the next steps.
-
-## 🔤 Example
-
-```mermaid
-flowchart LR
-    A["'Hello World'"] -->|lowercase| B["'hello world'"]
-    B -->|split| C["['hello', 'world']"]
-    C -->|lookup| D["[5, 9]"]
-```
-
-Vocab built from `["hello world", "this is a test", "hello test"]`:
-
-| ID | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
-|:--|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| Token | PAD | UNK | BOS | EOS | a | hello | is | test | this | world |
-
-`"hello unknown"` → `[5, 1]` (unseen word → **UNK**)
-
-
-
-## 🛠 Solution walkthrough
-
-1. **build_vocab:** add the 4 special tokens first (IDs 0–3)
-2. Collect lowercased words in a `set`, then **sort** them and assign IDs from 4
-3. Keep both maps (`word → id` and `id → word`) and set `vocab_size`
-4. **encode:** `text.lower().split()`, then `word_to_id.get(w, UNK)`
-5. **decode:** `id_to_word.get(i, UNK)` and join with spaces
-
-➡️ Code: [`solution.py`](solution.py)
-
-## ⚠️ Pitfalls
-
-- Not **sorting** the set → IDs change between runs.
-- Forgetting to **lowercase** in `encode` → `"Hello"` becomes UNK.
-- Starting word IDs at 0 → overwrites the special tokens.
-- Forgetting to set `vocab_size`.
-
-## ⏱ Complexity
-
-Build $O(N + U \log U)$ · Encode / Decode $O(L)$, where $N$ is the total number of words, $U$ the number of unique words, and $L$ the sequence length.
-
-<br>
+**Example:** training sentences `["hello world", "this is a test", "hello test"]`
 
 <div align="center">
 
-[⬅️ Back to Transformers](../Readme.md) · [Next: Embedding Layer ➡️](../02_Embedding_Layer/)
+| Word | a | hello | is | test | this | world |
+|:--|:--:|:--:|:--:|:--:|:--:|:--:|
+| **ID** | 4 | 5 | 6 | 7 | 8 | 9 |
 
 </div>
+
+- `hello` appears twice but gets **one** ID.
+- After this step, the vocabulary is **fixed**.
+
+<br>
+
+### $\color{red}{\text{2. Encode — text → list of IDs}}$
+
+1. Lowercase the text and split it on whitespace.
+2. **Look up** each word's ID.
+3. If the word isn't in the vocabulary, use `UNK` (`1`). Nothing is added.
+
+<div align="center">
+
+| Input | Output | Why |
+|:--|:--|:--|
+| `"hello world"` | `[5, 9]` | both words known |
+| `"Hello TEST"` | `[5, 7]` | lowercased first |
+| `"hello unknown"` | `[5, 1]` | `unknown` was never seen |
+| `"foo bar baz"` | `[1, 1, 1]` | no word is known |
+
+</div>
+
+<br>
+
+### $\color{red}{\text{3. Decode — list of IDs → text}}$
+
+1. **Look up** each ID's word, or use `UNK` if the ID doesn't exist.
+2. Join the words with spaces.
+
+<div align="center">
+
+| Input | Output | Why |
+|:--|:--|:--|
+| `[5, 9]` | `"hello world"` | both IDs known |
+| `[8, 6, 4, 7]` | `"this is a test"` | both IDs known |
+| `[5, 99]` | `"hello UNK"` | ID `99` doesn't exist |
+
+</div>
+
+
+<br>
+
+## ➡️ Code: [`solution.py`](solution.py)
+
+<br>
+
+<img src="../../../assets/divider.svg" width="100%"/>

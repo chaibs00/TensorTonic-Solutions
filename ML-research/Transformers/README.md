@@ -92,6 +92,25 @@ Before the `Transformer` was introduced, `RNNs`, particularly `LSTMs` and `GRUs`
 
 The authors introduced the `Transformer`, an architecture that replaced slow, word-by-word sequential processing with `self-attention`, allowing entire sequences of text to be processed in parallel during training.
 
+The original `Transformer` follows an `Encoder–Decoder` structure. The `encoder` processes the input sequence into contextual representations, while the `decoder` uses these representations to generate the output sequence.
+
+
+<details>
+<br>
+
+<summary>Encoder-only vs. Decoder-only</summary>
+
+Later models adopted just one  block, depending on their goals.
+
+- **`Encoder-only` (e.g., BERT):** Focuses on **understanding text** rather than generating it. It produces representations useful for tasks like sentiment analysis, text classification, and named entity recognition.
+
+- **`Decoder-only` (e.g., GPT):** Focuses on **generating text**. It reads a prompt and predicts the next token, then repeats this process to generate a response, making it suitable for chatbots, writing, and code generation.
+
+
+</details>
+
+
+<br>
 
 <div align="center">
 
@@ -101,65 +120,57 @@ The authors introduced the `Transformer`, an architecture that replaced slow, wo
 
 </div>
 
-### The Big Picture
+<br>
 
-The Transformer keeps the **encoder–decoder** setup used for translation:
 
-1. The **encoder** reads the whole input sentence and builds a rich representation of each word.
-2. The **decoder** generates the output sentence one word at a time, looking at the encoder's representations.
-3. A final **Linear + Softmax** layer turns the decoder's output into probabilities over the vocabulary to pick the next word.
+$\color{cyan}{\text{1. Input Embedding + Positional Encoding}}$
 
-> Each side is a stack of **6 identical layers** (`N×` in the figure).
+- Text is split into `tokens`, mapped to `token IDs`, and converted into `embeddings`.
+- The Transformer processes tokens in parallel during training.
+- `Positional Encodings` are added to the embeddings to provide information about the order of tokens in the sequence.
 
 <br>
 
-### 1. Input Embedding + Positional Encoding
+$\color{cyan}{\text{2. Self-Attention, the core idea}}$
 
-- Words are turned into **token IDs**, then into **vectors** (embeddings).
-- Attention looks at all words at once, so it has **no sense of order** by itself.
-- **Positional encoding** adds a position signal (built from sine/cosine waves) to each embedding, so *"dog bites man"* ≠ *"man bites dog"*.
+Each token looks at **every other tokens** in the sequence to determine which ones are most relevant to its context.
 
-### 2. Self-Attention, the core idea
+Each token is represented by three vectors :
+- **`Query`** : What information am I looking for?
+- **`Key`** : What information do I contain?
+- **`Value`**: what information do I pass on?
 
-Each word looks at **every other word** in the sentence and decides how much each one matters to it.
+$$
+\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+$$
 
-> In *"The animal didn't cross the street because **it** was too tired"*, attention helps **it** focus on **animal**.
-
-Each word plays three roles:
-- **Query**: what am I looking for?
-- **Key**: what do I contain?
-- **Value**: what information do I pass on?
-
-**Multi-Head Attention** runs several attentions in parallel, so each head can learn a different type of relationship (grammar, meaning, references…).
-
-### 3. The Encoder
-
-Each encoder layer has 2 parts:
-1. **Self-attention**: every input word gathers context from the other input words.
-2. **Feed-forward network**: refines each word's representation.
-
-**Output:** one context-aware vector per input word.
-
-### 4. The Decoder
-
-Each decoder layer has 3 parts:
-1. **Masked self-attention**: a word can only look at **previous** words, not future ones (no cheating while generating).
-2. **Encoder–decoder attention**: the decoder looks at the encoder's output to find the relevant input words (e.g. which English word to translate next).
-3. **Feed-forward network**: same as in the encoder.
-
-### 5. Feed-Forward Network
-
-A small 2-layer neural network applied to **each word separately**.
-Attention **mixes** information between words; the feed-forward network **processes** it within each word.
-
-### 6. Add & Norm (Residual Connections + Layer Normalization)
-
-Around every block, you see **Add & Norm** in the figure:
-- **Add (residual)**: the block's input is added to its output → information and gradients flow easily through deep stacks.
-- **Norm (layer normalization)**: keeps values in a stable range → faster, more stable training.
+**Multi-Head Attention** Runs several attention operations in parallel, allowing the model to capture different relationships between tokens.  (grammar, meaning, references…).
 
 
 
+<br>
+
+$\color{cyan}{\text{3. The Encoder and Decoder}}$
+
+The Transformer is built from encoder and decoder blocks, each containing attention and feed-forward layers.
+
+- `Encoder`: Uses `self-attention` to build contextual representations of the input sequence.
+
+- `Decoder`: Uses masked `self-attention` to process previously generated tokens and encoder–decoder attention to gather information from the input representations.
+
+
+<br>
+
+$\color{cyan}{\text{4. Feed-Forward Networks and Residual Connections}}$
+
+After attention, a feed-forward network further processes each token's representation. Residual connections and layer normalization help information flow through the network and support stable training.
+
+
+<br>
+
+$\color{cyan}{\text{5. Output Prediction}}$
+
+Finally, the decoder's output is converted into probabilities over the vocabulary. The model uses these probabilities to predict the next token and generate the output sequence.
 
 
 
@@ -167,18 +178,22 @@ Around every block, you see **Add & Norm** in the figure:
 
 <img src="../../assets/divider.svg" width="100%"/>
 
-## Roadmap  
+<br>
 
-| # | Topic | Description | Difficulty |
-|:-:|:------|:------------|:----------:|
-| 01 | [Tokenization](./01_Tokenization/) | Convert text to token IDs | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
-| 02 | Embedding Layer | Map tokens to vectors | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
-| 03 | Positional Encoding | Inject position via sinusoids | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
-| 04 | Scaled Dot-Product Attention | Core QKV mechanism | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
-| 05 | Multi-Head Attention | Parallel attention heads | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
-| 06 | Feed-Forward Network | Position-wise MLP | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
-| 07 | Layer Normalization | Normalize activations | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
-| 08 | Encoder Block | Complete encoder layer | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
-| 🏁 | **Assemble & train a Transformer** | End-to-end | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
+### $\color{#a3e635}{\text{Roadmap}}$
+
+| # | Topic | Directory | Description | Difficulty |
+|:-:|:------|:----------|:------------|:----------:|
+| 01 | $\color{#ea580c}{\text{Tokenization}}$ | [`01_Tokenization/`](./01_Tokenization/) | Convert text to token IDs | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 02 | $\color{#ea580c}{\text{Embedding Layer}}$ | [`02_Embedding_Layer/`](./02_Embedding_Layer/) | Map tokens to vectors | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 03 | $\color{#ea580c}{\text{Positional Encoding}}$ | [`03_Positional_Encoding/`](./03_Positional_Encoding/) | Inject position via sinusoids | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 04 | $\color{#ea580c}{\text{Scaled Dot-Product Attention}}$ | [`04_Scaled_Dot_Product_Attention/`](./04_Scaled_Dot_Product_Attention/) | Core QKV mechanism | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 05 | $\color{#ea580c}{\text{Multi-Head Attention}}$ | [`05_Multi_Head_Attention/`](./05_Multi_Head_Attention/) | Parallel attention heads | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
+| 06 | $\color{#ea580c}{\text{Feed-Forward Network}}$ | [`06_Feed_Forward_Network/`](./06_Feed_Forward_Network/) | Position-wise MLP | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 07 | $\color{#ea580c}{\text{Layer Normalization}}$ | [`07_Layer_Normalization/`](./07_Layer_Normalization/) | Normalize activations | ![Easy](https://img.shields.io/badge/Easy-22c55e?style=flat-square) |
+| 08 | $\color{#ea580c}{\text{Encoder Block}}$ | [`08_Encoder_Block/`](./08_Encoder_Block/) | Complete encoder layer | ![Medium](https://img.shields.io/badge/Medium-eab308?style=flat-square) |
+| 🏁 | **$\color{#ea580c}{\text{Assemble \& train a Transformer}}$** | [`09_Transformer/`](./09_Transformer/) | End-to-end | ![Hard](https://img.shields.io/badge/Hard-ef4444?style=flat-square) |
+
+
 
 <img src="../../assets/divider.svg" width="100%"/>
